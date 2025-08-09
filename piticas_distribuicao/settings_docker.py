@@ -5,12 +5,16 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-@mxfcvn(vcmdvk4w_(4rb%)ko4(#_-@q7$ydyv&^^$1zz!&jt8')
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-@mxfcvn(vcmdvk4w_(4rb%)ko4(#_-@q7$ydyv&^^$1zz!&jt8"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,*.onrender.com').split(',')
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS", "localhost,127.0.0.1,*.onrender.com"
+).split(",")
 
 # Application definition
 INSTALLED_APPS = [
@@ -90,7 +94,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Configuração do WhiteNoise para servir arquivos estáticos
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files
 MEDIA_URL = "/media/"
@@ -110,6 +114,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Personalizar títulos da administração
 from django.contrib import admin
+
 admin.site.site_header = "Manutenção Cadastral Piticas"
 admin.site.site_title = "Piticas Admin"
 admin.site.index_title = "Bem-vindo à Manutenção Cadastral"

@@ -1,17 +1,21 @@
 import os
-from decouple import config, Csv
 from pathlib import Path
+
+from decouple import Csv, config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-@mxfcvn(vcmdvk4w_(4rb%)ko4(#_-@q7$ydyv&^^$1zz!&jt8')
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-@mxfcvn(vcmdvk4w_(4rb%)ko4(#_-@q7$ydyv&^^$1zz!&jt8",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
 # Application definition
 INSTALLED_APPS = [
@@ -57,13 +61,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "piticas_distribuicao.wsgi.application"
 
 # Database
-DATABASE_URL = config('DATABASE_URL', default='')
+DATABASE_URL = config("DATABASE_URL", default="")
 if DATABASE_URL:
     # PostgreSQL para produção (Render, Railway, Heroku)
     import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
-    }
+
+    DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 else:
     # SQLite para desenvolvimento
     DATABASES = {
@@ -100,7 +103,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Configuração do WhiteNoise para servir arquivos estáticos
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files
 MEDIA_URL = "/media/"

@@ -5,13 +5,13 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-pythonanywhere-secret-key-piticas-2025'
+SECRET_KEY = "django-pythonanywhere-secret-key-piticas-2025"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 # PythonAnywhere permite qualquer host
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -91,7 +91,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # WhiteNoise configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files
 MEDIA_URL = "/media/"
@@ -111,6 +111,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Admin customization
 from django.contrib import admin
+
 admin.site.site_header = "Manutenção Cadastral Piticas"
 admin.site.site_title = "Piticas Admin"
 admin.site.index_title = "Bem-vindo à Manutenção Cadastral"
