@@ -11,7 +11,8 @@ services:
       - DEBUG=True
       - SECRET_KEY=django-insecure-@mxfcvn(vcmdvk4w_(4rb%)ko4(#_-@q7$ydyv&^^$1zz!&jt8
       - ALLOWED_HOSTS=localhost,127.0.0.1
-      - DJANGO_SETTINGS_MODULE=piticas_distribuicao.settings_render
+      - DJANGO_SETTINGS_MODULE=piticas_distribuicao.settings_docker
+      - DOCKER=true
     volumes:
       - .:/app
       - media_volume:/app/media
