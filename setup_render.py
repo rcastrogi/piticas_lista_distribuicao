@@ -8,7 +8,7 @@ import django
 
 # Detectar se estamos no Render (ou qualquer ambiente de produção)
 if 'RENDER' in os.environ or 'DATABASE_URL' in os.environ:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'piticas_distribuicao.settings_production')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'piticas_distribuicao.settings_render')
 else:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'piticas_distribuicao.settings')
 
