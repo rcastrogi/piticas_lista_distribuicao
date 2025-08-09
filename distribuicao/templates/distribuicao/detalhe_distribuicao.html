@@ -1,0 +1,197 @@
+{% extends 'distribuicao/base.html' %}
+{% load math_filters %}
+
+{% block page_title %}Detalhes da Distribuição{% endblock %}
+
+{% block header_buttons %}
+    <a href="{% url 'lista_distribuicao' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+    {% if user.is_superuser or user.is_staff %}
+    <a href="{% url 'admin:distribuicao_listadistribuicao_change' lista.pk %}" class="btn btn-warning">
+        <i class="bi bi-pencil"></i> Editar
+    </a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Informações Gerais -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Informações da Distribuição</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Código:</dt>
+                    <dd class="col-sm-9"><strong>{{ lista.codigo }}</strong></dd>
+                    
+                    <dt class="col-sm-3">Período:</dt>
+                    <dd class="col-sm-9">{{ mes_nome }} de {{ lista.ano }}</dd>
+                    
+                    <dt class="col-sm-3">Loja:</dt>
+                    <dd class="col-sm-9">
+                        <strong>{{ lista.loja.codigo }}</strong> - {{ lista.loja.descricao }}
+                    </dd>
+                    
+                    <dt class="col-sm-3">Produto:</dt>
+                    <dd class="col-sm-9">
+                        <strong>{{ lista.produto.codigo }}</strong> - {{ lista.produto.descricao }}
+                        {% if lista.produto.imagem %}
+                            <br>
+                            <img src="{{ lista.produto.imagem.url }}" alt="{{ lista.produto.descricao }}" 
+                                 class="img-thumbnail mt-2" style="max-width: 200px;">
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-3">Licença:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-info">{{ lista.produto.licenca.codigo }}</span>
+                        {{ lista.produto.licenca.descricao }}
+                    </dd>
+                    
+                    <dt class="col-sm-3">Grade:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-secondary">{{ lista.produto.grade.codigo }}</span>
+                        {{ lista.produto.grade.descricao }}
+                    </dd>
+                    
+                    <dt class="col-sm-3">Pack de Grade:</dt>
+                    <dd class="col-sm-9">{{ lista.produto.pack_grade.nome }}</dd>
+                    
+                    <dt class="col-sm-3">Preço Unitário:</dt>
+                    <dd class="col-sm-9"><strong>R$ {{ lista.produto.preco_unitario|floatformat:2 }}</strong></dd>
+                    
+                    <dt class="col-sm-3">Data de Criação:</dt>
+                    <dd class="col-sm-9">{{ lista.data_criacao|date:"d/m/Y H:i" }}</dd>
+                    
+                    <dt class="col-sm-3">Última Atualização:</dt>
+                    <dd class="col-sm-9">{{ lista.data_atualizacao|date:"d/m/Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resumo das Quantidades -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-calculator"></i> Resumo</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Quantidade para Consultor:</label>
+                    <div class="alert alert-warning mb-2">
+                        <strong>{{ lista.quantidade_consultor }}</strong> unidades
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Quantidade para Loja:</label>
+                    <div class="alert alert-success mb-2">
+                        <strong>{{ lista.quantidade_loja }}</strong> unidades
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Total de Unidades:</label>
+                    <div class="alert alert-primary mb-2">
+                        <strong>{{ lista.quantidade_total }}</strong> unidades
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Valor Total:</label>
+                    <div class="alert alert-info mb-2">
+                        <strong>R$ {{ lista.valor_total|floatformat:2 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detalhes do Pack de Grade -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-grid-3x3-gap"></i> Composição do Pack de Grade</h5>
+            </div>
+            <div class="card-body">
+                {% if pack_itens %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tamanho</th>
+                                    <th>Quantidade por Pack</th>
+                                    <th>Qtd Total Consultor</th>
+                                    <th>Qtd Total Loja</th>
+                                    <th>Qtd Total Geral</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in pack_itens %}
+                                <tr>
+                                    <td><span class="badge bg-secondary">{{ item.tamanho }}</span></td>
+                                    <td>{{ item.quantidade }}</td>
+                                    <td>{{ item.quantidade|mul:lista.quantidade_consultor }}</td>
+                                    <td>{{ item.quantidade|mul:lista.quantidade_loja }}</td>
+                                    <td><strong>{{ item.quantidade|mul:lista.quantidade_total }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong><i class="bi bi-info-circle"></i> Explicação:</strong>
+                        Esta tabela mostra quantas peças de cada tamanho serão distribuídas, 
+                        baseado na composição do pack de grade "{{ lista.produto.pack_grade.nome }}".
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Nenhum item encontrado para este pack de grade.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Consultores da Loja (se aplicável) -->
+{% if lista.loja.consultores.exists %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-people"></i> Consultores da Loja</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for consultor in lista.loja.consultores.all %}
+                    <div class="col-md-4 mb-2">
+                        <div class="alert alert-light">
+                            <strong>{{ consultor.codigo }}</strong> - {{ consultor.nome }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Filtro customizado para multiplicação no template
+document.addEventListener('DOMContentLoaded', function() {
+    // Qualquer JavaScript adicional para esta página
+});
+</script>
+{% endblock %}

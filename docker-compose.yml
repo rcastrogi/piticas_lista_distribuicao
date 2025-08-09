@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-@mxfcvn(vcmdvk4w_(4rb%)ko4(#_-@q7$ydyv&^^$1zz!&jt8
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+    volumes:
+      - .:/app
+      - media_volume:/app/media
+    command: >
+      sh -c "python manage.py migrate &&
+             python setup_deploy.py &&
+             python manage.py runserver 0.0.0.0:8000"
+
+volumes:
+  media_volume:

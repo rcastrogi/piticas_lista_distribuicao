@@ -1,0 +1,234 @@
+{% extends 'distribuicao/base.html' %}
+
+{% block page_title %}Relatório Mensal{% endblock %}
+
+{% block content %}
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6><i class="bi bi-funnel"></i> Filtros do Relatório</h6>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="mes" class="form-label">Mês</label>
+                <select name="mes" class="form-control">
+                    <option value="">Todos os meses</option>
+                    <option value="1" {% if mes == "1" %}selected{% endif %}>Janeiro</option>
+                    <option value="2" {% if mes == "2" %}selected{% endif %}>Fevereiro</option>
+                    <option value="3" {% if mes == "3" %}selected{% endif %}>Março</option>
+                    <option value="4" {% if mes == "4" %}selected{% endif %}>Abril</option>
+                    <option value="5" {% if mes == "5" %}selected{% endif %}>Maio</option>
+                    <option value="6" {% if mes == "6" %}selected{% endif %}>Junho</option>
+                    <option value="7" {% if mes == "7" %}selected{% endif %}>Julho</option>
+                    <option value="8" {% if mes == "8" %}selected{% endif %}>Agosto</option>
+                    <option value="9" {% if mes == "9" %}selected{% endif %}>Setembro</option>
+                    <option value="10" {% if mes == "10" %}selected{% endif %}>Outubro</option>
+                    <option value="11" {% if mes == "11" %}selected{% endif %}>Novembro</option>
+                    <option value="12" {% if mes == "12" %}selected{% endif %}>Dezembro</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="ano" class="form-label">Ano</label>
+                <input type="number" name="ano" class="form-control" value="{{ ano|default:'2025' }}" 
+                       min="2020" max="2030">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Gerar Relatório
+                </button>
+                <a href="{% url 'relatorio_mensal' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Cabeçalho do Relatório -->
+{% if mes and ano %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-graph-up"></i> 
+            Relatório Mensal - {{ mes_nome }} de {{ ano }}
+            {% if loja_usuario and not user.is_superuser and not user.is_staff %}
+                <small class="ms-2">- {{ loja_usuario.codigo }} ({{ loja_usuario.descricao }})</small>
+            {% endif %}
+        </h4>
+    </div>
+</div>
+{% endif %}
+
+<!-- Relatório -->
+{% if relatorio %}
+    {% for produto_key, dados in relatorio.items %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">{{ produto_key }}</h5>
+                    <small class="text-muted">
+                        Licença: {{ dados.produto.licenca.codigo }} | 
+                        Grade: {{ dados.produto.grade.codigo }} | 
+                        Pack: {{ dados.produto.pack_grade.nome }}
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <span class="badge bg-success fs-6">R$ {{ dados.valor_total|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Resumo do Produto -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-warning text-dark p-2 rounded">
+                            <strong>{{ dados.total_consultor }}</strong>
+                            <small class="d-block">Total Consultor</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-success text-white p-2 rounded">
+                            <strong>{{ dados.total_loja }}</strong>
+                            <small class="d-block">Total Loja</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-primary text-white p-2 rounded">
+                            <strong>{{ dados.total_consultor|add:dados.total_loja }}</strong>
+                            <small class="d-block">Total Geral</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="bg-info text-white p-2 rounded">
+                            <strong>R$ {{ dados.produto.preco_unitario|floatformat:2 }}</strong>
+                            <small class="d-block">Preço Unitário</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detalhamento por Loja -->
+            {% if user.is_superuser or user.is_staff %}
+            <h6><i class="bi bi-shop"></i> Detalhamento por Loja:</h6>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>Loja</th>
+                            <th>Qtd Consultor</th>
+                            <th>Qtd Loja</th>
+                            <th>Total</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loja_info in dados.lojas %}
+                        <tr>
+                            <td>
+                                <strong>{{ loja_info.loja.codigo }}</strong>
+                                <small class="d-block text-muted">{{ loja_info.loja.descricao }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">{{ loja_info.qtd_consultor }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">{{ loja_info.qtd_loja }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ loja_info.qtd_consultor|add:loja_info.qtd_loja }}</strong>
+                            </td>
+                            <td>
+                                <strong>R$ {{ loja_info.valor|floatformat:2 }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Resumo Geral -->
+    {% if relatorio|length > 1 %}
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-calculator"></i> Resumo Geral do Período</h5>
+        </div>
+        <div class="card-body">
+            {% with total_geral_consultor=0 total_geral_loja=0 valor_geral=0 %}
+                {% for produto_key, dados in relatorio.items %}
+                    {% with total_geral_consultor=total_geral_consultor|add:dados.total_consultor %}
+                    {% with total_geral_loja=total_geral_loja|add:dados.total_loja %}
+                    {% with valor_geral=valor_geral|add:dados.valor_total %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                {% endfor %}
+                
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="bg-warning text-dark p-3 rounded">
+                            <h4>{{ total_geral_consultor }}</h4>
+                            <small>Total Consultor</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-success text-white p-3 rounded">
+                            <h4>{{ total_geral_loja }}</h4>
+                            <small>Total Loja</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-primary text-white p-3 rounded">
+                            <h4>{{ total_geral_consultor|add:total_geral_loja }}</h4>
+                            <small>Total Geral</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-info text-white p-3 rounded">
+                            <h4>R$ {{ valor_geral|floatformat:2 }}</h4>
+                            <small>Valor Total</small>
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        </div>
+    </div>
+    {% endif %}
+    
+{% elif mes and ano %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-inbox display-1 text-muted"></i>
+            <h4 class="text-muted">Nenhum dado encontrado</h4>
+            <p class="text-muted">
+                Não foram encontradas listas de distribuição para {{ mes_nome }} de {{ ano }}.
+            </p>
+            <a href="{% url 'lista_distribuicao' %}" class="btn btn-primary">
+                <i class="bi bi-list-ul"></i> Ver Todas as Listas
+            </a>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-graph-up display-1 text-muted"></i>
+            <h4 class="text-muted">Selecione o Período</h4>
+            <p class="text-muted">
+                Escolha o mês e ano acima para gerar o relatório mensal de distribuição.
+            </p>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

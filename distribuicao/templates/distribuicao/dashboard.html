@@ -1,0 +1,135 @@
+{% extends 'distribuicao/base.html' %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Cards de estatísticas -->
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-header">
+                <i class="bi bi-list-ul"></i> Total de Listas
+            </div>
+            <div class="card-body">
+                <h2 class="card-title">{{ total_listas }}</h2>
+                <p class="card-text">Listas de distribuição cadastradas</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-header">
+                <i class="bi bi-currency-dollar"></i> Valor Total
+            </div>
+            <div class="card-body">
+                <h2 class="card-title">R$ {{ valor_total|floatformat:2 }}</h2>
+                <p class="card-text">Valor total das distribuições</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-info">
+            <div class="card-header">
+                <i class="bi bi-shop"></i> Sua Loja
+            </div>
+            <div class="card-body">
+                {% if loja_usuario %}
+                    <h5 class="card-title">{{ loja_usuario.codigo }}</h5>
+                    <p class="card-text">{{ loja_usuario.descricao }}</p>
+                {% else %}
+                    <p class="card-text">Não associado a uma loja</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Listas recentes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> Listas Recentes</h5>
+            </div>
+            <div class="card-body">
+                {% if listas_recentes %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Mês/Ano</th>
+                                    <th>Loja</th>
+                                    <th>Produto</th>
+                                    <th>Qtd Total</th>
+                                    <th>Valor Total</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lista in listas_recentes %}
+                                <tr>
+                                    <td>{{ lista.codigo }}</td>
+                                    <td>
+                                        {% for mes_num, mes_nome in lista.MESES_CHOICES %}
+                                            {% if mes_num == lista.mes %}{{ mes_nome }}{% endif %}
+                                        {% endfor %}
+                                        /{{ lista.ano }}
+                                    </td>
+                                    <td>{{ lista.loja.codigo }} - {{ lista.loja.descricao }}</td>
+                                    <td>{{ lista.produto.codigo }} - {{ lista.produto.descricao }}</td>
+                                    <td>{{ lista.quantidade_total }}</td>
+                                    <td>R$ {{ lista.valor_total|floatformat:2 }}</td>
+                                    <td>
+                                        <a href="{% url 'detalhe_distribuicao' lista.pk %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                        <p class="text-muted">Nenhuma lista de distribuição encontrada.</p>
+                        <a href="{% url 'lista_distribuicao' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Ver Todas as Listas
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações rápidas -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning"></i> Ações Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{% url 'lista_distribuicao' %}" class="btn btn-primary">
+                        <i class="bi bi-list-ul"></i> Ver Todas as Listas
+                    </a>
+                    <a href="{% url 'relatorio_mensal' %}" class="btn btn-success">
+                        <i class="bi bi-graph-up"></i> Relatório Mensal
+                    </a>
+                    {% if user.is_superuser or user.is_staff %}
+                    <a href="{% url 'admin:index' %}" class="btn btn-warning" target="_blank">
+                        <i class="bi bi-gear"></i> Manutenção Cadastral
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

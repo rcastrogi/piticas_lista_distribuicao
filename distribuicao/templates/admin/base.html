@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+.custom-footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    margin-top: 20px;
+    color: #6c757d;
+    font-size: 14px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+{% endblock %}
+
+{% block footer %}
+<div class="custom-footer">
+    <strong>By Renato Castrogiovanni</strong>
+</div>
+<script>
+// Adicionar o rodapé ao final da página se não existir
+document.addEventListener('DOMContentLoaded', function() {
+    if (!document.querySelector('.custom-footer')) {
+        var footer = document.createElement('div');
+        footer.className = 'custom-footer';
+        footer.innerHTML = '<strong>By Renato Castrogiovanni</strong>';
+        document.body.appendChild(footer);
+    }
+});
+</script>
+{% endblock %}
