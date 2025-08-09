@@ -1,14 +1,9 @@
-# Use Python oficial
+# Dockerfile para desenvolvimento (sem PostgreSQL)
 FROM python:3.13.2-slim
 
 # Configurar variáveis de ambiente
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE piticas_distribuicao.settings_render
-
-# Instalar dependências do sistema necessárias
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
 
 # Criar diretório de trabalho
 WORKDIR /app
@@ -16,7 +11,7 @@ WORKDIR /app
 # Atualizar pip
 RUN pip install --upgrade pip
 
-# Copiar requirements e instalar dependências Python
+# Copiar requirements básico e instalar dependências
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -26,7 +21,7 @@ COPY . .
 # Coletar arquivos estáticos
 RUN python manage.py collectstatic --noinput
 
-# Executar migrações e setup (se não houver DATABASE_URL, usará SQLite)
+# Executar migrações e setup com SQLite
 RUN python manage.py migrate && python setup_render.py
 
 # Expor porta

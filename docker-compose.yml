@@ -2,19 +2,22 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
       - "8000:8000"
     environment:
       - DEBUG=True
       - SECRET_KEY=django-insecure-@mxfcvn(vcmdvk4w_(4rb%)ko4(#_-@q7$ydyv&^^$1zz!&jt8
       - ALLOWED_HOSTS=localhost,127.0.0.1
+      - DJANGO_SETTINGS_MODULE=piticas_distribuicao.settings_render
     volumes:
       - .:/app
       - media_volume:/app/media
     command: >
       sh -c "python manage.py migrate &&
-             python setup_deploy.py &&
+             python setup_render.py &&
              python manage.py runserver 0.0.0.0:8000"
 
 volumes:
